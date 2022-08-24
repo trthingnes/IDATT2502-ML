@@ -122,3 +122,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# IDEA
+.idea
+
+# Data files
+*.csv
