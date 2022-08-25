@@ -5,16 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Set hyper-parameters
-lr = 1e-7
-n_epochs = 3000
+lr = 1e-4
+n_epochs = 10000
 
 # Load data from file
-data = np.loadtxt("length_weight.csv", delimiter=",", dtype="f")
-x_tensor = torch.from_numpy(data[:, 0]).reshape(-1, 1)  # Length
-y_tensor = torch.from_numpy(data[:, 1]).reshape(-1, 1)  # Weight
+data = np.loadtxt("day_length_weight.csv", delimiter=",", dtype="f")
+x_tensor = torch.from_numpy(data[:, 1:]).reshape(-1, 2)  # Length, weight
+y_tensor = torch.from_numpy(data[:, 0]).reshape(-1, 1)  # Day
 
 # Build a sequential model with a single linear layer
-model = nn.Linear(1, 1)
+model = nn.Linear(2, 1)
 print(model.state_dict())
 
 # Define loss and optimizer functions
@@ -49,14 +49,17 @@ for epoch in range(n_epochs):
 print(np.array(losses))
 print(f"Loss: { losses[-1] }")
 
+print(f"x: 10, y: 80, z: {model(torch.tensor([[10, 80]]).float())}")
+
 # Visualize result
-plt.plot(x_tensor, y_tensor, 'o')
-plt.xlabel('x (length)')
-plt.ylabel('y (weight)')
+ax = plt.figure().add_subplot(projection="3d")
 
-x = torch.tensor([[torch.min(x_tensor)], [torch.max(x_tensor)]])
-y = model(x).detach()
-plt.plot(x, y, label='$\\hat y = f(x) = xW+b$')
+ax.scatter(x_tensor[:, 0], x_tensor[:, 1], y_tensor, 'o')
 
-plt.legend()
+ax.plot([10], [80], model(torch.tensor([[10, 80]]).float()).detach()[0], color="orange")
+
+ax.set_xlabel("x: Length")
+ax.set_ylabel("y: Weight")
+ax.set_zlabel("z: Day")
+
 plt.show()
